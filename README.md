@@ -1,5 +1,14 @@
-Available Features
-    - [x] List Available Chat Rooms
-    - [x] Create a Chat Room
-    - [x] Join Any Chat Room 
-    
+# Front-End Application
+
+This repository contains the frontend application for the chat application, clone the repository to get started.
+
+  - User can Create a Room
+  - User can send a Message in room
+  - messages will be aligned according to the userid to left or right
+
+Steps to generate output
+    cd project_directory
+    npm install
+    npm run start
+
+project should run on any port other that 3000, becuase backend application will be running on 3000.
