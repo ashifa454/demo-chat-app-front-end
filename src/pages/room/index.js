@@ -8,17 +8,19 @@ class Room extends React.Component {
     super(props);
     this.state = {
       inputValue: "",
-      messages: []
+      messages: [],
+      roomId: this.props.location.state ? this.props.location.state.roomId : null,
     };
-    console.log("here is props", this.props);
   }
   handleSendMessage = () => {
     let { inputValue } = this.state;
+    const { match } = this.props;
     const { messages } = this.state;
     if (inputValue.length > 0) {
       socket.emit("message", {
-        roomId: this.props.match.params.roomId,
+        roomId: this.state.roomId,
         uid: localStorage.getItem("userId"),
+        roomName: match.params.roomId,
         message: inputValue
       });
       inputValue = "";
@@ -26,14 +28,10 @@ class Room extends React.Component {
     }
   };
   componentDidMount() {
-    const { match } = this.props;
+    const { match, location } = this.props;
 
     socket.emit("joinRoom", {
       roomName: match.params.roomId
-    });
-    socket.emit("getAllMessages", {
-      roomName: this.props.match.params.roomId,
-      uid: localStorage.getItem("userId")
     });
     socket.once("allMessages", messages => {
       console.log("here are messages", messages);
@@ -44,6 +42,12 @@ class Room extends React.Component {
       messages.push(data);
       this.setState({ data });
     });
+    socket.on('connectedToRoom', roomData => {
+      socket.emit("getAllMessages", {
+        roomId: roomData._id,
+      });
+      this.setState({ roomId: roomData._id })
+    })
     /**
      * Bind Enter on Enter
      */
@@ -79,9 +83,9 @@ class Room extends React.Component {
                       item.uid === localStorage.getItem("userId")
                         ? "my-message"
                         : ""
-                    }`}
+                      }`}
                   >
-                    <div>{item.text}</div>
+                    <div>{item.message}</div>
                   </div>
                 );
               })}

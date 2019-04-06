@@ -42,7 +42,10 @@ class Home extends Component {
         this.setState({ formInput });
     };
     handleCreateRoom = () => {
-        this.props.history.push(`/room/${this.state.formInput}`);
+        const { rooms, formInput } = this.state;
+        if (rooms.findIndex(item => item.name === formInput) < 0) {
+            this.props.history.push(`/room/${this.state.formInput}`);
+        }
     };
     render() {
         const { rooms } = this.state;
