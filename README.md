@@ -5,6 +5,8 @@ This repository contains the frontend application for the chat application, clon
   - User can Create a Room
   - User can send a Message in room
   - messages will be aligned according to the userid to left or right
+  - All user gets a unique id
+  - All Rooms and Messages get Stored in db
 
 Steps to generate output
     cd project_directory
