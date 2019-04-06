@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router-dom";
+import { socket } from "../../config/socket";
 import MouseTrap from "mousetrap";
 import "./style.scss";
 class Room extends React.Component {
@@ -13,18 +14,38 @@ class Room extends React.Component {
   handleSendMessage = () => {
     let { inputValue } = this.state;
     const { messages } = this.state;
-    messages.push({
-      uid: "ashif",
+    socket.emit("message", {
+      roomName: this.props.match.params.roomId,
+      uid: localStorage.getItem("userId"),
       text: inputValue
     });
     inputValue = "";
     this.setState({ messages, inputValue });
   };
   componentDidMount() {
+    const { match } = this.props;
+    socket.emit("joinRoom", {
+      roomName: match.params.roomId
+    });
+    socket.emit("getAllMessages", {
+      roomName: this.props.match.params.roomId,
+      uid: localStorage.getItem("userId")
+    });
+    socket.once("allMessages", messages => {
+        console.log("here are messages", messages);
+      this.setState({ messages: messages });
+    });
+    socket.on("messageReceived", data => {
+      const { messages } = this.state;
+      messages.push(data);
+      this.setState({ data });
+    });
     MouseTrap.bind("enter", this.handleSendMessage);
   }
   componentWillUnmount() {
+    socket.off("messageReceived");
     MouseTrap.unbind("enter");
+    socket.off("joinRoom");
   }
   handleOnChange = e => {
     const { target } = e;
@@ -48,7 +69,9 @@ class Room extends React.Component {
                 return (
                   <div
                     className={`item ${
-                      item.uid === "ashif" ? "my-message" : ""
+                      item.uid === localStorage.getItem("userId")
+                        ? "my-message"
+                        : ""
                     }`}
                   >
                     <div>{item.text}</div>
