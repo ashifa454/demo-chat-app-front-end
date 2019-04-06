@@ -1,6 +1,8 @@
 import io from "socket.io-client";
-
+import cuid from 'cuid';
 export const socket = io("http://localhost:3000");
 socket.on("connect", () => {
-  localStorage.setItem("userId", socket.id);
+  if (localStorage.getItem('userId') === null) {
+    localStorage.setItem("userId", cuid());
+  }
 });

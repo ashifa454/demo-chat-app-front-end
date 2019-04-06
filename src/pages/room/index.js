@@ -10,20 +10,24 @@ class Room extends React.Component {
       inputValue: "",
       messages: []
     };
+    console.log("here is props", this.props);
   }
   handleSendMessage = () => {
     let { inputValue } = this.state;
     const { messages } = this.state;
-    socket.emit("message", {
-      roomName: this.props.match.params.roomId,
-      uid: localStorage.getItem("userId"),
-      text: inputValue
-    });
-    inputValue = "";
-    this.setState({ messages, inputValue });
+    if (inputValue.length > 0) {
+      socket.emit("message", {
+        roomId: this.props.match.params.roomId,
+        uid: localStorage.getItem("userId"),
+        message: inputValue
+      });
+      inputValue = "";
+      this.setState({ messages, inputValue });
+    }
   };
   componentDidMount() {
     const { match } = this.props;
+
     socket.emit("joinRoom", {
       roomName: match.params.roomId
     });
@@ -32,7 +36,7 @@ class Room extends React.Component {
       uid: localStorage.getItem("userId")
     });
     socket.once("allMessages", messages => {
-        console.log("here are messages", messages);
+      console.log("here are messages", messages);
       this.setState({ messages: messages });
     });
     socket.on("messageReceived", data => {
@@ -40,6 +44,9 @@ class Room extends React.Component {
       messages.push(data);
       this.setState({ data });
     });
+    /**
+     * Bind Enter on Enter
+     */
     MouseTrap.bind("enter", this.handleSendMessage);
   }
   componentWillUnmount() {
