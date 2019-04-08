@@ -43,6 +43,7 @@ class Room extends React.Component {
       this.setState({ data });
     });
     socket.on('connectedToRoom', roomData => {
+      console.log(roomData);
       socket.emit("getAllMessages", {
         roomId: roomData._id,
       });
